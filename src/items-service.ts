@@ -23,6 +23,7 @@ app.get('/data', async (request, response) => {
     } catch (e) {
         const activeSpan = api.trace.getSpan(api.context.active());
         console.error(`Critical error`, { traceId: activeSpan.spanContext().traceId});
+        activeSpan.recordException(e);
         response.sendStatus(500);
     }
 })
