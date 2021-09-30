@@ -18,4 +18,8 @@ services:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
     ports: 
       - 9090:9090
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
 

@@ -1,14 +1,17 @@
 import { MeterProvider } from '@opentelemetry/sdk-metrics-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { SimpleSpanProcessor, BatchSpanProcessor, ConsoleSpanExporter, } from '@opentelemetry/sdk-trace-base';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { ExpressInstrumentation } from 'opentelemetry-instrumentation-express';
+import { ExpressInstrumentation, ExpressRequestHookInformation } from 'opentelemetry-instrumentation-express';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
-
+import { Span, Baggage } from '@opentelemetry/api';
+import { AlwaysOnSampler, AlwaysOffSampler, ParentBasedSampler, TraceIdRatioBasedSampler } from '@opentelemetry/core';
+import { IORedisInstrumentation } from '@opentelemetry/instrumentation-ioredis'
+import { serviceSyncDetector } from 'opentelemetry-resource-detector-service';
 
 const init = function (serviceName: string, metricPort: number) {
 
@@ -16,27 +19,40 @@ const init = function (serviceName: string, metricPort: number) {
     const metricExporter = new PrometheusExporter({ port: metricPort }, () => {
         console.log(`scrape: http://localhost:${metricPort}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`);
     });
-    const meter = new MeterProvider({ exporter: metricExporter, interval: 1000 }).getMeter(serviceName);
+    const meter = new MeterProvider({ exporter: metricExporter, interval: 10000 }).getMeter(serviceName);
 
     // Define traces
-    const traceExporter = new JaegerExporter({ endpoint: 'http://localhost:14268/api/traces' });
+    const traceExporter = new JaegerExporter({ endpoint: 'http://localhost:14268/api/traces'});
+
+    // const serviceResources = serviceSyncDetector.detect();
+    // const customResources = new Resource({'my-resource':1});
+
     const provider = new NodeTracerProvider({
         resource: new Resource({
-            [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
+            [SemanticResourceAttributes.SERVICE_NAME]: serviceName
+        }),
+        sampler:new ParentBasedSampler({
+            root: new TraceIdRatioBasedSampler(1)
         })
     });
-
-    provider.addSpanProcessor(new SimpleSpanProcessor(traceExporter))
+    provider.addSpanProcessor(new SimpleSpanProcessor(traceExporter));
+    // provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+    // provider.addSpanProcessor(new BatchSpanProcessor(traceExporter));
     provider.register();
     registerInstrumentations({
         instrumentations: [
-            new ExpressInstrumentation(),
-            new HttpInstrumentation()
+            new ExpressInstrumentation({
+                requestHook: (span, reqInfo) => {
+                    span.setAttribute('request-headers',JSON.stringify(reqInfo.req.headers))
+                }
+            }),
+            new HttpInstrumentation(),
+            new IORedisInstrumentation()
         ]
     });
     const tracer = provider.getTracer(serviceName);
 
-    return { meter,tracer };
+    return { meter, tracer };
 }
 
 export default init;

@@ -7,6 +7,7 @@ This repo store all the resources and code demos there were presented at https:/
 You can find the bootcamp resources here:
  * Episode 1 - [slides](https://docs.google.com/presentation/d/1V9ByAsZkL2PcumSb0PrFSAAnc8Yizqa4QhVNP27xlr4/edit?usp=sharing) and [video recording](https://www.youtube.com/watch?v=UEwkn0iHDzA&ab_channel=Aspecto)
 
+* Episode 2 - [slides](https://docs.google.com/presentation/d/18STZLN7xjjCjesF6IoC3aT9p7UcHIiTFAmVZWYILoKU/edit?usp=sharing) and [video recording](https://www.youtube.com/watch?v=nIWCmh0pOUM)
 
  To join the slack channel: https://app.slack.com/client/T08PSQ7BQ/C02D7BPU5U3
 
