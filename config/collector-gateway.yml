@@ -1,0 +1,54 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4319
+      grpc:
+        endpoint: 0.0.0.0:4320
+
+exporters:
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: promexample
+    const_labels:
+      label1: value1
+
+  logging:
+    loglevel: error
+
+  jaeger:
+    endpoint: jaeger:14250
+    insecure: true
+
+  # elasticsearch:
+  #   endpoints:
+  #     - "http://elastic:9200"
+  #   index: "span"
+
+processors:
+  batch:
+    timeout: 1s
+  resource:
+    attributes:
+      - key: component.name2
+        value: "gateway"
+        action: insert
+
+extensions:
+  health_check:
+  pprof:
+    endpoint: :1888
+  zpages:
+    endpoint: :55679
+
+service:
+  extensions: [pprof, zpages, health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, resource]
+      exporters: [logging, jaeger]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, prometheus]
