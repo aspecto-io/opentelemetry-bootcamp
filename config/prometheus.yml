@@ -3,8 +3,8 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  # metrics_path defaults to '/metrics'
-  # scheme defaults to 'http'.
+#   # metrics_path defaults to '/metrics'
+#   # scheme defaults to 'http'.
   - job_name: prometheus
 
     scrape_interval: 5s
@@ -12,4 +12,4 @@ scrape_configs:
     honor_labels: true
 
     static_configs:
-      - targets: ['host.docker.internal:8091','host.docker.internal:8081']
+      - targets: ['collector-agent:8889']
