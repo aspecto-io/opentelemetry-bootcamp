@@ -12,4 +12,4 @@ scrape_configs:
     honor_labels: true
 
     static_configs:
-      - targets: ['host.docker.internal:8091','host.docker.internal:8081']
+      - targets: ['collector-gateway:8889']

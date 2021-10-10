@@ -12,21 +12,22 @@ import { Span, Baggage } from '@opentelemetry/api';
 import { AlwaysOnSampler, AlwaysOffSampler, ParentBasedSampler, TraceIdRatioBasedSampler } from '@opentelemetry/core';
 import { IORedisInstrumentation } from '@opentelemetry/instrumentation-ioredis'
 import { serviceSyncDetector } from 'opentelemetry-resource-detector-service';
+import { CollectorTraceExporter, CollectorMetricExporter, } from '@opentelemetry/exporter-collector';
+
 
 const init = function (serviceName: string, metricPort: number) {
 
     // Define metrics
-    const metricExporter = new PrometheusExporter({ port: metricPort }, () => {
-        console.log(`scrape: http://localhost:${metricPort}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`);
-    });
+    // const metricExporter = new PrometheusExporter({ port: metricPort }, () => {
+    //     console.log(`scrape: http://localhost:${metricPort}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`);
+    // });
+    const metricExporter = new CollectorMetricExporter({
+        url: 'http://localhost:4318/v1/metrics'
+    })
     const meter = new MeterProvider({ exporter: metricExporter, interval: 10000 }).getMeter(serviceName);
 
     // Define traces
-    const traceExporter = new JaegerExporter({ endpoint: 'http://localhost:14268/api/traces'});
-
-    // const serviceResources = serviceSyncDetector.detect();
-    // const customResources = new Resource({'my-resource':1});
-
+    // const traceExporter = new JaegerExporter({ endpoint: 'http://localhost:14268/api/traces'});
     const provider = new NodeTracerProvider({
         resource: new Resource({
             [SemanticResourceAttributes.SERVICE_NAME]: serviceName
@@ -35,9 +36,10 @@ const init = function (serviceName: string, metricPort: number) {
             root: new TraceIdRatioBasedSampler(1)
         })
     });
+    const traceExporter = new CollectorTraceExporter({
+        url: 'http://localhost:4318/v1/trace'
+    })
     provider.addSpanProcessor(new SimpleSpanProcessor(traceExporter));
-    // provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-    // provider.addSpanProcessor(new BatchSpanProcessor(traceExporter));
     provider.register();
     registerInstrumentations({
         instrumentations: [
