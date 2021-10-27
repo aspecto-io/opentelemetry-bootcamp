@@ -1,18 +1,18 @@
 version: '3'
 
 services:
-  elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
-    environment:
-      - discovery.type=single-node
-    ports:
-      - "9200:9200"
-      - "9300:9300"
+  # elastic:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+  #   environment:
+  #     - discovery.type=single-node
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
   jaeger:
     image: jaegertracing/all-in-one
-    environment:
-     - SPAN_STORAGE_TYPE=elasticsearch
-     - ES_SERVER_URLS=http://elastic:9200
+    # environment:
+    #  - SPAN_STORAGE_TYPE=elasticsearch
+    #  - ES_SERVER_URLS=http://elastic:9200
     ports: 
       - 5775:5775
       - 6831:6831
@@ -36,7 +36,7 @@ services:
     ports:
       - 6379:6379
   collector-gateway:
-    image: otel/opentelemetry-collector:0.29.0
+    image: otel/opentelemetry-collector-contrib
     volumes: 
       - ./config/collector-gateway.yml:/etc/otel-collector-config.yaml
     command: ["--config=/etc/otel-collector-config.yaml"]

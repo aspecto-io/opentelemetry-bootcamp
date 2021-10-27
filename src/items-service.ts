@@ -30,6 +30,7 @@ app.get('/data', async (request, response) => {
     }
 })
 
+
 app.get('/pub', (request, response) => {
     const activeSpan = api.trace.getSpan(api.context.active());
 

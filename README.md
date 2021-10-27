@@ -11,6 +11,8 @@ You can find the bootcamp resources here:
 
 * Episode 3 - [slides](https://docs.google.com/presentation/d/1LbvF3uvmNXKNgCOdid5Ckttba-5fGRmAfMLoO6uC_QU/edit?usp=sharing) and [video recording](https://www.youtube.com/watch?v=L_gjG4BjvSE&ab_channel=Aspecto)
 
+* Episode 4 - [slides](https://docs.google.com/presentation/d/17d9ElzYHwJ2o9lMfDAwGD1nNUFq00-p7BOWdYT22HcI/edit?usp=sharing) and [video recording](https://www.youtube.com/watch?v=tb6VHrihPZI&t=3291s&ab_channel=Aspecto)
+
  To join the slack channel: https://app.slack.com/client/T08PSQ7BQ/C02D7BPU5U3
 
 

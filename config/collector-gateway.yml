@@ -14,7 +14,23 @@ processors:
       - key: test.key
         value: "gateway"
         action: insert
-
+  tail_sampling:
+    decision_wait: 2s
+    num_traces: 100
+    expected_new_traces_per_sec: 1
+    policies:
+      [
+          # {
+          #   name: test-policy-1,
+          #   type: status_code,
+          #   status_code: {status_codes: [ERROR]}
+          # },
+          # {
+          #   name: test-policy-2,
+          #   type: latency,
+          #   latency: {threshold_ms: 1500}
+          # },
+      ]
 exporters:
   prometheus:
     endpoint: "0.0.0.0:8889"
@@ -28,7 +44,8 @@ exporters:
 
   jaeger:
     endpoint: jaeger:14250
-    insecure: true
+    tls:
+      insecure: true
 
 extensions:
   health_check:
@@ -42,7 +59,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch, resource]
+      processors: [tail_sampling, batch, resource]
       exporters: [logging, jaeger]
     metrics:
       receivers: [otlp]
