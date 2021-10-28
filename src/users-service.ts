@@ -1,11 +1,33 @@
 import init from './tracer';
-init('users-services', 8091);
+const { tracer } = init('users-services', 8091);
 
 import * as api from '@opentelemetry/api';
 import axios from 'axios';
 import * as express from 'express';
 const app = express();
 const randomNumber = (min: number, max: number) => Math.floor(Math.random() * max + min);
+
+import { WebSocketServer } from 'ws';
+
+const wss = new WebSocketServer({ port: 8092 });
+
+wss.on('connection', function connection(ws) {
+    ws.on('message', function incoming(message) {
+        try{
+        const payload = JSON.parse(message?.toString());
+        // // const propagatedContext = api.propagation.extract(api.ROOT_CONTEXT, payload);
+        // const wsSpan = tracer.startSpan('got ws message', {
+            // attributes: {
+                // 'payload': message?.toString()
+            // }});
+        // }}, propagatedContext)
+        console.log('received: %s', message);
+        // wsSpan.end();
+    } catch(e){
+        console.error(e)
+    }
+    });
+});
 
 import * as Redis from 'ioredis';
 const redis = new Redis();

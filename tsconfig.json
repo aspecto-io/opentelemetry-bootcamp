@@ -1,0 +1,9 @@
+{
+    "exclude": ["node_modules/**"],
+    "compilerOptions": {
+        "target": "ES2017",
+        "lib": ["ES2019", "DOM"],
+        "module": "commonjs",
+        "moduleResolution": "node",
+    }
+}

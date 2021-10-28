@@ -13,6 +13,7 @@ import { AlwaysOnSampler, AlwaysOffSampler, ParentBasedSampler, TraceIdRatioBase
 import { IORedisInstrumentation } from '@opentelemetry/instrumentation-ioredis'
 import { serviceSyncDetector } from 'opentelemetry-resource-detector-service';
 import { CollectorTraceExporter, CollectorMetricExporter, } from '@opentelemetry/exporter-collector';
+import WsInstrumentation from './ws-instrumentation/ws';
 
 
 const init = function (serviceName: string, metricPort: number) {
@@ -24,10 +25,10 @@ const init = function (serviceName: string, metricPort: number) {
     const metricExporter = new CollectorMetricExporter({
         url: 'http://localhost:4318/v1/metrics'
     })
-    const meter = new MeterProvider({ exporter: metricExporter, interval: 10000 }).getMeter(serviceName);
+    const meter = new MeterProvider({ exporter: metricExporter, interval: 100000 }).getMeter(serviceName);
 
     // Define traces
-    // const traceExporter = new JaegerExporter({ endpoint: 'http://localhost:14268/api/traces'});
+    const traceExporter = new JaegerExporter({ endpoint: 'http://localhost:14268/api/traces'});
     const provider = new NodeTracerProvider({
         resource: new Resource({
             [SemanticResourceAttributes.SERVICE_NAME]: serviceName
@@ -36,9 +37,9 @@ const init = function (serviceName: string, metricPort: number) {
             root: new TraceIdRatioBasedSampler(1)
         })
     });
-    const traceExporter = new CollectorTraceExporter({
-        url: 'http://localhost:4318/v1/trace'
-    })
+    // const traceExporter = new CollectorTraceExporter({
+    //     url: 'http://localhost:4318/v1/trace'
+    // })
     provider.addSpanProcessor(new SimpleSpanProcessor(traceExporter));
     provider.register();
     registerInstrumentations({
@@ -49,11 +50,11 @@ const init = function (serviceName: string, metricPort: number) {
                 }
             }),
             new HttpInstrumentation(),
-            new IORedisInstrumentation()
+            new IORedisInstrumentation(),
+             new WsInstrumentation()
         ]
     });
     const tracer = provider.getTracer(serviceName);
-
     return { meter, tracer };
 }
 
