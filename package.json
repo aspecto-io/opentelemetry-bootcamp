@@ -27,7 +27,7 @@
     "@types/node": "^16.9.4",
     "@types/ws": "^8.2.0",
     "axios": "^0.21.4",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "ioredis": "^4.27.9",
     "opentelemetry-instrumentation-express": "^0.25.0",
     "opentelemetry-resource-detector-service": "^0.25.0",
